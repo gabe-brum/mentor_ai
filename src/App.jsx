@@ -47,7 +47,6 @@ function App() {
         Aspirações de carreira: ${aspirations}
         `;
 
-        // Prompt otimizado para evitar repetições e garantir formatação clara
         const prompt_base = `Você é um mentor de carreira sênior para desenvolvedores bem humorado e um pouco sarcástico. Seu objetivo é guiar desenvolvedores juniores para alcançarem um nível sênior em sua área.
         O perfil do desenvolvedor júnior é: ${fullProfile} e seu nome é ${nameDev}
 
@@ -271,7 +270,7 @@ function App() {
                    />
                 </div>
                 <div className="form-group">
-                   <label htmlFor="aspirations">Suas aspirações de carreira e technologies desejadas:</label>
+                   <label htmlFor="aspirations">Suas aspirações de carreira e tecnologias desejadas:</label>
                    <textarea
                        id="aspirations"
                        value={aspirations}
