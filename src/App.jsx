@@ -131,8 +131,8 @@ function App() {
     }
 
     const doc = new jsPDF();
-    let y = 15; // Posição Y inicial
-    const marginX = 15; // Margem esquerda e direita
+    let y = 15;
+    const marginX = 15;
 
     // Função auxiliar para adicionar texto com quebra de linha
     const addText = (text, x, yPos, maxWidth, fontSize = 12, fontStyle = 'normal') => {
@@ -148,7 +148,7 @@ function App() {
     doc.text("Plano de Carreira para Desenvolvedores", marginX, y);
     y += 10;
     doc.setFontSize(10);
-    doc.text(`Perfil: ${areaOfInterest} com ${experience} anos de experiência`, marginX, y);
+    doc.text(`Perfil: ${areaOfInterest} com ${experience} anos de experiência para ${nameDev}`, marginX, y);
     y += 20; // Espaço após o cabeçalho do documento
 
     // --- Processar o HTML do planContent ---
@@ -222,14 +222,14 @@ function App() {
 
     return (
         <div className="App">
-            <h1>Mentor IA para Desenvolvedores Juniores</h1>
+            <h1 className='mentor-ai'>Mentor IA para Desenvolvedores Juniores</h1>
 
             {error && <p className="error-message">Erro: {error}</p>}
             {isLoading && <p className='loader'>Carregando...</p>}
 
             {!planContent && (
               <section className="mentor-form-section">
-                <h2 className='title'>Gerar Plano de Carreira</h2>
+                <h2>Gerar Plano de Carreira</h2>
                 <div className="form-group">
                    <label htmlFor="experience">Informe seu nome:</label>
                    <input

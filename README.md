@@ -1,12 +1,18 @@
-# React + Vite
+# Mentor AI - o guia para devs juniores
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Projeto desenvolvido para a Imersão AI Alura + Google Gemini
 
-Currently, two official plugins are available:
+## Como rodar o projeto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Basta fazer o clone do projeto e em seu terminal rodar o seguinte comando
+`yarn && yarn dev` ou `npm install && npm run dev`
 
-## Expanding the ESLint configuration
+## Criação da API key
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Para que o projeto rode corretamente, é necessário que você insira sua chave de API para poder utilizar os poderes do Gemini. Como essa chave é um valor sensível e esse projeto é apenas uma idealização e prototipação, deixei para que cada um insira a sua.
+Para criar a sua chave você pode acessar o guia feito pela Aluna em https://www.youtube.com/watch?v=5TNzbqMM_2k
+
+### Uso da API key no projeto
+
+Tendo copiado a sua chave, basta acessar seu App.jsx e no local onde é feito a inicialização do GoogleGenerativeAI, coloque a dentro das aspas:
+![Local de inserção da API key](image.png)

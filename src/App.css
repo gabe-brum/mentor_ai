@@ -32,6 +32,11 @@ h1 {
   margin-bottom: 30px;
 }
 
+h1.mentor-ai {
+  max-width: 80%;
+  margin: 0 auto;
+}
+
 h2 {
   color: #34495e;
   border-bottom: 2px solid #eee;
