@@ -22,6 +22,10 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.loader {
+  margin-bottom: 20px;
+}
+
 h1 {
   text-align: center;
   color: #2c3e50;
@@ -31,21 +35,18 @@ h1 {
 h2 {
   color: #34495e;
   border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
-  margin-top: 40px;
-  margin-bottom: 20px;
+  margin: 20px;
 }
+
 
 h3 {
   color: #555;
-  margin-top: 25px;
-  margin-bottom: 15px;
 }
 
 hr {
   border: none;
   border-top: 1px dashed #ccc;
-  margin: 50px 0;
+  margin-top: 20px;
 }
 
 .error-message {
@@ -77,9 +78,9 @@ pre {
   overflow-x: auto;
 }
 
-.plan-content {
-  white-space: pre-wrap;
-  font-family: monospace;
+.plan-content > ul {
+  width: 50%;
+  margin: 0 auto;
 }
 
 .buttons {

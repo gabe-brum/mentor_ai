@@ -13,9 +13,11 @@ function App() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const planContentTreated = planContent.replace('```html', '').replace('```', '')
+
     const hasAllInformation = !isLoading && !!nameDev && !!experience && !!technologies && !!areaOfInterest && !!aspirations
 
-    const genAI = new GoogleGenerativeAI('AIzaSyBkpOXH9yCLWm3B98rPl3g87fUMsEcmHzY'); // Test key that will be deleted later
+    const genAI = new GoogleGenerativeAI(''); // Put here your API key from Google
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
@@ -46,55 +48,63 @@ function App() {
         `;
 
         // Prompt otimizado para evitar repetições e garantir formatação clara
-        const prompt_base = `Você é um mentor de carreira sênior para desenvolvedores. Seu objetivo é guiar desenvolvedores juniores para alcançarem um nível sênior em sua área.
+        const prompt_base = `Você é um mentor de carreira sênior para desenvolvedores bem humorado e um pouco sarcástico. Seu objetivo é guiar desenvolvedores juniores para alcançarem um nível sênior em sua área.
         O perfil do desenvolvedor júnior é: ${fullProfile} e seu nome é ${nameDev}
 
-        Com base neste perfil, gere um plano de desenvolvimento COMPLETO e DETALHADO, seguindo rigorosamente a estrutura abaixo.
-        Não repita informações e use linhas em branco para separar claramente cada seção e sub-seção.
+        Com base neste perfil, gere um plano de desenvolvimento COMPLETO e DETALHADO, formatado usando **tags HTML semânticas e de formatação** para melhor apresentação. Siga rigorosamente a estrutura abaixo:
 
-        ## Saudação e Motivação Inicial
-        [Uma mensagem de boas-vindas e encorajamento, personalizada para o perfil.]
+        <h2>Saudação e Motivação Inicial</h2>
+        <p>[Uma mensagem de boas-vindas e encorajamento, personalizada para o perfil.]</p>
+        <hr/>
 
-        ---
+        <h2>Análise do Perfil e Lacunas Identificadas</h2>
+        <p>[Apresente uma breve análise do perfil do desenvolvedor.]</p>
+        <h3>Principais Lacunas:</h3>
+        <ul>
+            <li>... [Lacuna 1]</li>
+            <li>... [Lacuna 2]</li>
+            </ul>
+        <hr/>
 
-        ## Análise do Perfil e Lacunas Identificadas
-        [Apresente uma breve análise do perfil do desenvolvedor. Em seguida, liste os pontos fortes e, principalmente, as **principais lacunas de conhecimento e habilidades** que o desenvolvedor precisa preencher para se tornar sênior na área (frontend ou backend). Use bullet points para as lacunas.]
+        <h2>Plano de Desenvolvimento Personalizado: Rumo ao Sênior</h2>
+        <p>[Uma breve introdução ao plano.]</p>
 
-        ---
+        <h3>Seção 1: [Exemplo: Fundamentos Essenciais para Sênior]</h3>
+        <ul>
+            <li><strong>Tópico 1.1:</strong> ...</li>
+            <li><strong>Tópico 1.2:</strong> ...</li>
+            <li><strong>Projeto Sugerido 1:</strong> ...</li>
+        </ul>
 
-        ## Plano de Desenvolvimento Personalizado: Rumo ao Sênior
-        [Crie um plano de estudos e projetos práticos. Organize por tópicos ou fases, sendo muito específico. Inclua technologies-chave, conceitos importantes e sugestões de mini-projetos ou exercícios. Use bullet points para os itens de estudo e projetos.]
+        <h3>Seção 2: [Exemplo: Aprofundamento em Tecnologia-Chave]</h3>
+        <ul>
+            <li><strong>Tópico 2.1:</strong> ...</li>
+            <li><strong>Tópico 2.2:</strong> ...</li>
+            <li><strong>Projeto Sugerido 2:</strong> ...</li>
+        </ul>
+        <hr/>
 
-        ---
+        <h2>Recursos de Aprendizado Sugeridos</h2>
+        <p>[Introdução aos recursos.]</p>
+        <ul>
+            <li><strong>Para [Lacuna/Tópico 1]:</strong>
+                <ul>
+                    <li><a href="...">... [Recurso 1]</a></li>
+                    <li>... [Recurso 2]</li>
+                </ul>
+            </li>
+            </ul>
+        <hr/>
 
-        ### Seção 1: [Exemplo: Fundamentos Essenciais para Sênior]
-        * [Tópico 1.1]
-        * [Tópico 1.2]
-        * [Projeto Sugerido 1]
+        <h2>O Papel de um Desenvolvedor Sênior em Sua Área</h2>
+        <p>[Explique as responsabilidades de um sênior.]</p>
+        <hr/>
 
-        ### Seção 2: [Exemplo: Aprofundamento em Tecnologia-Chave]
-        * [Tópico 2.1]
-        * [Tópico 2.2]
-        * [Projeto Sugerido 2]
+        <h2>Desafios Práticos e Próximos Passos</h2>
+        <p>[Sugestões de desafios e encorajamento final.]</p>
+        <hr/>
 
-        ---
-
-        ## Recursos de Aprendizado Sugeridos
-        [Para cada lacuna ou tópico importante no plano, sugira 3-5 recursos de aprendizado de alta qualidade (ex: livros, cursos online específicos, documentações oficiais, canais do YouTube renomados, repositórios GitHub de referência, artigos técnicos, comunidades relevantes). Organize por tópico ou tipo de recurso.]
-
-        ---
-
-        ## O Papel de um Desenvolvedor Sênior em Sua Área
-        [Explique em detalhes as responsabilidades, expectativas e o escopo de atuação de um desenvolvedor sênior na área específica deste júnior (ex: liderança técnica, design de arquitetura, mentoria de juniores, code review, otimização de performance, decisões de stack). Seja claro e conciso.]
-
-        ---
-
-        ## Desafios Práticos e Próximos Passos
-        [Sugira 1-2 pequenos desafios ou problemas de codificação para o desenvolvedor júnior resolver (não a solução, mas a descrição do desafio). Incentive a prática contínua e a busca por feedback. Encerre com uma mensagem final de encorajamento.]
-
-        ---
-
-        **Importante:** Mantenha um tom profissional e motivador. Utilize negrito para destacar termos importantes. Assegure que as seções sejam delimitadas por '---' e que cada tópico dentro delas use bullet points como '-' e esteja em uma nova linha.
+        **Importante:** Use tags HTML como <h1>, <h2>, <h3>, <p>, <ul>, <li>, <strong>, <hr/>, e <a> para formatar o conteúdo. O conteúdo dentro das tags deve ser o texto relevante.
         `;
 
         try {
@@ -114,80 +124,92 @@ function App() {
         }
     };
 
-    const handleDownloadPdf = () => {
-        if (!planContent) {
-            setError("Nenhum plano gerado para baixar.");
-            return;
+  const handleDownloadPdf = () => {
+    if (!planContent) {
+        setError("Nenhum plano gerado para baixar.");
+        return;
+    }
+
+    const doc = new jsPDF();
+    let y = 15; // Posição Y inicial
+    const marginX = 15; // Margem esquerda e direita
+
+    // Função auxiliar para adicionar texto com quebra de linha
+    const addText = (text, x, yPos, maxWidth, fontSize = 12, fontStyle = 'normal') => {
+        doc.setFont(doc.getFont().fontName, fontStyle);
+        doc.setFontSize(fontSize);
+        const splitText = doc.splitTextToSize(text, maxWidth);
+        doc.text(splitText, x, yPos);
+        return yPos + (splitText.length * fontSize * 0.9); // Retorna nova posição Y
+    };
+
+    // --- Título Principal do PDF ---
+    doc.setFontSize(22);
+    doc.text("Plano de Carreira para Desenvolvedores", marginX, y);
+    y += 10;
+    doc.setFontSize(10);
+    doc.text(`Perfil: ${areaOfInterest} com ${experience} anos de experiência`, marginX, y);
+    y += 20; // Espaço após o cabeçalho do documento
+
+    // --- Processar o HTML do planContent ---
+    // Cria um elemento DOM temporário para parsear o HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = planContent;
+
+    // Itera sobre os nós filhos (h1, h2, p, ul, hr)
+    Array.from(tempDiv.children).forEach(node => {
+        // Garante que não ultrapassa o limite da página
+        if (y > 270) { // Margem de 270 para não chegar ao final da página
+            doc.addPage();
+            y = 15; // Reseta Y
         }
 
-        const doc = new jsPDF();
-        let y = 15;
+        const textContent = node.textContent.trim(); // Texto puro do nó
 
-        doc.setFontSize(22);
-        doc.text("Seu Plano de Carreira Rumo ao Nível Sênior", 15, y);
-        y += 10;
-        doc.setFontSize(10);
-        doc.text(`Perfil: ${areaOfInterest} com ${experience} anos de experiência`, 15, y);
-        y += 20;
+        if (node.tagName === 'H1') {
+            y += 10; // Espaço antes do H1
+            y = addText(textContent, marginX, y, 180, 20, 'bold');
+            y += 8; // Espaço após o H1
+        } else if (node.tagName === 'H2') {
+            y += 8; // Espaço antes do H2
+            y = addText(textContent, marginX, y, 180, 16, 'bold');
+            y += 6; // Espaço após o H2
+        } else if (node.tagName === 'H3') {
+            y += 6; // Espaço antes do H3
+            y = addText(textContent, marginX, y, 180, 14, 'bold');
+            y += 4; // Espaço após o H3
+        } else if (node.tagName === 'P') {
+            y = addText(textContent, marginX, y, 180);
+            y += 6; // Espaço após o parágrafo
+        } else if (node.tagName === 'UL') {
+            y += 5; // Espaço antes da lista
+            Array.from(node.children).forEach(li => {
+                if (li.tagName === 'LI') {
+                    let liText = li.textContent.trim();
+                    // Tenta preservar negrito dentro do LI, mas `jsPDF` não suporta tags HTML para estilo
+                    // Apenas remove as tags para não aparecer no texto
+                    liText = liText.replace(/<\/?strong>/g, ''); // Remove tags <strong>
+                    
+                    // Quebra o texto da lista para ajustar na página
+                    const splitLiText = doc.splitTextToSize(`• ${liText}`, 170); // Margem maior para bullet
+                    doc.setFont(doc.getFont().fontName, 'normal'); // Volta para normal para lista
+                    doc.setFontSize(12);
+                    doc.text(splitLiText, marginX + 5, y); // Recuo para o bullet point
+                    y += (splitLiText.length * 7); // Incrementa Y baseado no número de linhas
+                }
+            });
+            y += 5; // Espaço após a lista
+        } else if (node.tagName === 'HR') {
+            y += 10; // Espaço antes da linha
+            doc.setDrawColor(0); // Cor da linha (preto)
+            doc.line(marginX, y, 210 - marginX, y); // Desenha uma linha horizontal
+            y += 10; // Espaço após a linha
+        }
+    });
 
-        doc.setFontSize(12);
-        const lines = planContent.split('\n');
-
-        lines.forEach(line => {
-            const trimmedLine = line.trim();
-
-            if (trimmedLine === '---') {
-                doc.setDrawColor(0);
-                doc.line(15, y, 195, y);
-                y += 10;
-                return;
-            }
-
-            if (!trimmedLine) {
-                y += 5;
-                return;
-            }
-
-            // Trata cabeçalhos (##)
-            if (trimmedLine.startsWith('## ')) {
-                doc.setFontSize(16);
-                doc.text(trimmedLine.replace('## ', ''), 15, y);
-                y += 10; // Espaço após o cabeçalho
-            }
-            // Trata sub-cabeçalhos (###)
-            else if (trimmedLine.startsWith('### ')) {
-                doc.setFontSize(14);
-                doc.text(trimmedLine.replace('### ', ''), 15, y);
-                y += 8; // Espaço após o sub-cabeçalho
-            }
-            // Trata bullet points (* ou -)
-            else if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
-                doc.setFontSize(12);
-                // wrap text for bullet points
-                const bulletText = trimmedLine.replace(/^[*-]\s/, ''); // Remove '*' ou '-'
-                const splitText = doc.splitTextToSize(`• ${bulletText}`, 180); // Ajusta a largura para o conteúdo
-                doc.text(splitText, 20, y); // Recua um pouco para o bullet
-                y += (splitText.length * 7); // Incrementa Y baseado no número de linhas do texto quebrado
-            }
-            // Trata negrito (simples, não renderiza negrito real no PDF com essa abordagem)
-            else {
-                doc.setFontSize(12);
-                const processedLine = trimmedLine.replace(/\*\*(.*?)\*\*/g, '$1'); // Remove ** para exibir texto normal
-                const splitText = doc.splitTextToSize(processedLine, 180); // Quebra o texto se for muito longo
-                doc.text(splitText, 15, y);
-                y += (splitText.length * 7); // Incrementa Y baseado no número de linhas do texto quebrado
-            }
-
-            // Adiciona nova página se não houver espaço suficiente
-            if (y > 280) { // Perto do final da página
-                doc.addPage();
-                y = 15; // Reseta Y para a nova página
-            }
-        });
-
-        const filename = `Plano_Carreira_${areaOfInterest.replace(' ', '_')}.pdf`;
-        doc.save(filename);
-    };
+    const filename = `Plano_Carreira_${areaOfInterest.replace(' ', '_')}.pdf`;
+    doc.save(filename);
+};
 
     const resetPlan = () => {
       setNameDev('')
@@ -203,11 +225,11 @@ function App() {
             <h1>Mentor IA para Desenvolvedores Juniores</h1>
 
             {error && <p className="error-message">Erro: {error}</p>}
-            {isLoading && <p>Carregando...</p>}
+            {isLoading && <p className='loader'>Carregando...</p>}
 
             {!planContent && (
               <section className="mentor-form-section">
-                <h2>Gerar Plano de Carreira</h2>
+                <h2 className='title'>Gerar Plano de Carreira</h2>
                 <div className="form-group">
                    <label htmlFor="experience">Informe seu nome:</label>
                    <input
@@ -266,8 +288,8 @@ function App() {
 
             {planContent && (
                 <div className="plan-output">
-                    <h3>Seu Plano de Carreira:</h3>
-                    <pre className='plan-content'>{planContent}</pre>
+                    <h1>Seu Plano de Carreira:</h1>
+                    <div className='plan-content' dangerouslySetInnerHTML={{ __html: planContentTreated }} />
                     <div className='buttons'>
                       <button onClick={handleDownloadPdf} disabled={isLoading}>
                         Baixar Plano como PDF
