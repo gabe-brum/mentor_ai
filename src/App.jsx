@@ -24,8 +24,6 @@ function App() {
     const generationConfig = {
         temperature: 0.7,
         topP: 0.95,
-        topK: 0,
-        maxOutputTokens: 2048,
     };
 
     const safetySettings = [
@@ -123,92 +121,164 @@ function App() {
         }
     };
 
-  const handleDownloadPdf = () => {
-    if (!planContent) {
-        setError("Nenhum plano gerado para baixar.");
-        return;
-    }
+    const handleDownloadPdf = () => {
+      if (!planContent) {
+          setError("Nenhum plano gerado para baixar.");
+          return;
+      }
 
-    const doc = new jsPDF();
-    let y = 15;
-    const marginX = 15;
+      const doc = new jsPDF();
+      let y = 15; // Posição Y inicial
+      const marginX = 15; // Margem esquerda e direita
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const availableWidth = pageWidth - 2 * marginX; // Largura disponível para o texto
+      const bottomMargin = 25; // AUMENTADO! Margem inferior para nova página.
+      const pageBreakPadding = 5; // Um pequeno "buffer" extra antes da quebra de página
 
-    // Função auxiliar para adicionar texto com quebra de linha
-    const addText = (text, x, yPos, maxWidth, fontSize = 12, fontStyle = 'normal') => {
-        doc.setFont(doc.getFont().fontName, fontStyle);
-        doc.setFontSize(fontSize);
-        const splitText = doc.splitTextToSize(text, maxWidth);
-        doc.text(splitText, x, yPos);
-        return yPos + (splitText.length * fontSize * 0.9); // Retorna nova posição Y
-    };
+      // Multiplicador padrão para altura de linha (leading)
+      const lineSpacingFactor = 1.1; // AUMENTADO para 1.1 para mais espaçamento dentro do texto
+      const listItemLineSpacingFactor = 0.9; // Mantido para listas, elas são mais compactas
 
-    // --- Título Principal do PDF ---
-    doc.setFontSize(22);
-    doc.text("Plano de Carreira para Desenvolvedores", marginX, y);
-    y += 10;
-    doc.setFontSize(10);
-    doc.text(`Perfil: ${areaOfInterest} com ${experience} anos de experiência para ${nameDev}`, marginX, y);
-    y += 20; // Espaço após o cabeçalho do documento
+      // Função auxiliar para calcular a altura do texto
+      const addTextAndGetHeight = (text, fontSize = 12, fontStyle = 'normal', width = availableWidth) => {
+          doc.setFont(doc.getFont().fontName, fontStyle);
+          doc.setFontSize(fontSize);
+          const splitText = doc.splitTextToSize(text, width);
+          return splitText.length * fontSize * lineSpacingFactor;
+      };
+      
+      // Função auxiliar para efetivamente desenhar o texto
+      const drawText = (text, yPos, fontSize = 12, fontStyle = 'normal', indent = 0, width = availableWidth) => {
+          doc.setFont(doc.getFont().fontName, fontStyle);
+          doc.setFontSize(fontSize);
+          const splitText = doc.splitTextToSize(text, width - indent); // Ajusta largura para indentação
+          doc.text(splitText, marginX + indent, yPos);
+          return yPos + (splitText.length * fontSize * lineSpacingFactor);
+      }
 
-    // --- Processar o HTML do planContent ---
-    // Cria um elemento DOM temporário para parsear o HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = planContent;
+      // --- Título Principal do PDF ---
+      let titleHeight = addTextAndGetHeight("Plano de Carreira para Desenvolvedores", 22, 'bold');
+      let profileInfoHeight = addTextAndGetHeight(`Perfil: ${nameDev} é dev com interesse em ${areaOfInterest} e tem ${experience} anos de experiência.`, 10);
+      
+      if (y + titleHeight + profileInfoHeight + 10 + pageBreakPadding > pageHeight - bottomMargin) {
+          doc.addPage();
+          y = 15;
+      }
+      y = drawText("Plano de Carreira para Desenvolvedores", y, 22, 'bold');
+      y = drawText(`Perfil: ${nameDev} é dev com interesse em ${areaOfInterest} e tem ${experience} anos de experiência.`, y, 10);
+      y += 10; // Espaço após o cabeçalho do documento
 
-    // Itera sobre os nós filhos (h1, h2, p, ul, hr)
-    Array.from(tempDiv.children).forEach(node => {
-        // Garante que não ultrapassa o limite da página
-        if (y > 270) { // Margem de 270 para não chegar ao final da página
-            doc.addPage();
-            y = 15; // Reseta Y
-        }
+      // --- Processar o HTML do planContent ---
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = planContent;
 
-        const textContent = node.textContent.trim(); // Texto puro do nó
+      // Converter a coleção de filhos em um array para iterar
+      const childrenNodes = Array.from(tempDiv.children);
 
-        if (node.tagName === 'H1') {
-            y += 10; // Espaço antes do H1
-            y = addText(textContent, marginX, y, 180, 20, 'bold');
-            y += 8; // Espaço após o H1
-        } else if (node.tagName === 'H2') {
-            y += 8; // Espaço antes do H2
-            y = addText(textContent, marginX, y, 180, 16, 'bold');
-            y += 6; // Espaço após o H2
-        } else if (node.tagName === 'H3') {
-            y += 6; // Espaço antes do H3
-            y = addText(textContent, marginX, y, 180, 14, 'bold');
-            y += 4; // Espaço após o H3
-        } else if (node.tagName === 'P') {
-            y = addText(textContent, marginX, y, 180);
-            y += 6; // Espaço após o parágrafo
-        } else if (node.tagName === 'UL') {
-            y += 5; // Espaço antes da lista
-            Array.from(node.children).forEach(li => {
-                if (li.tagName === 'LI') {
-                    let liText = li.textContent.trim();
-                    // Tenta preservar negrito dentro do LI, mas `jsPDF` não suporta tags HTML para estilo
-                    // Apenas remove as tags para não aparecer no texto
-                    liText = liText.replace(/<\/?strong>/g, ''); // Remove tags <strong>
-                    
-                    // Quebra o texto da lista para ajustar na página
-                    const splitLiText = doc.splitTextToSize(`• ${liText}`, 170); // Margem maior para bullet
-                    doc.setFont(doc.getFont().fontName, 'normal'); // Volta para normal para lista
-                    doc.setFontSize(12);
-                    doc.text(splitLiText, marginX + 5, y); // Recuo para o bullet point
-                    y += (splitLiText.length * 7); // Incrementa Y baseado no número de linhas
-                }
-            });
-            y += 5; // Espaço após a lista
-        } else if (node.tagName === 'HR') {
-            y += 10; // Espaço antes da linha
-            doc.setDrawColor(0); // Cor da linha (preto)
-            doc.line(marginX, y, 210 - marginX, y); // Desenha uma linha horizontal
-            y += 10; // Espaço após a linha
-        }
-    });
+      for (let i = 0; i < childrenNodes.length; i++) {
+          const node = childrenNodes[i];
+          const textContent = node.textContent.trim();
+          let estimatedNodeHeight = 0; // Altura estimada para o nó atual, incluindo espaçamento
+          let initialYForNode = y; // Guarda o 'y' antes de adicionar espaçamento pré-elemento
 
-    const filename = `Plano_Carreira_${areaOfInterest.replace(' ', '_')}.pdf`;
-    doc.save(filename);
-};
+          // Calcular a altura estimada do nó e seu espaçamento antes
+          if (node.tagName === 'H1') {
+              estimatedNodeHeight = addTextAndGetHeight(textContent, 20, 'bold');
+              estimatedNodeHeight += 10; // Espaço após H1
+              initialYForNode += 5; // Espaço antes H1
+          } else if (node.tagName === 'H2') {
+              estimatedNodeHeight = addTextAndGetHeight(textContent, 16, 'bold');
+              estimatedNodeHeight += 8; // Espaço após H2
+              initialYForNode += 6; // Espaço antes H2
+          } else if (node.tagName === 'H3') {
+              estimatedNodeHeight = addTextAndGetHeight(textContent, 14, 'bold');
+              estimatedNodeHeight += 6; // Espaço após H3
+              initialYForNode += 4; // Espaço antes H3
+          } else if (node.tagName === 'P') {
+              estimatedNodeHeight = addTextAndGetHeight(textContent, 12);
+              estimatedNodeHeight += 4; // Espaço após P
+          } else if (node.tagName === 'UL') {
+              estimatedNodeHeight += 3; // Espaço antes da lista
+              Array.from(node.children).forEach(li => {
+                  if (li.tagName === 'LI') {
+                      let liText = li.textContent.trim().replace(/<\/?strong>/g, '');
+                      // Usamos listItemLineSpacingFactor para o cálculo de altura de LI
+                      doc.setFontSize(12); // Definir temporariamente para o cálculo
+                      const splitLiTextCalc = doc.splitTextToSize(`• ${liText}`, availableWidth - 10); // Mesma largura do desenho
+                      estimatedNodeHeight += splitLiTextCalc.length * 12 * listItemLineSpacingFactor; // Altura LI
+                      estimatedNodeHeight += 1; // Pequeno espaço entre itens de lista
+
+                      if (li.querySelector('ul')) {
+                          Array.from(li.querySelector('ul').children).forEach(nestedLi => {
+                              if (nestedLi.tagName === 'LI') {
+                                  let nestedLiText = nestedLi.textContent.trim().replace(/<\/?strong>/g, '');
+                                  doc.setFontSize(12); // Definir temporariamente
+                                  const splitNestedTextCalc = doc.splitTextToSize(`  - ${nestedLiText}`, availableWidth - 15);
+                                  estimatedNodeHeight += splitNestedTextCalc.length * 12 * listItemLineSpacingFactor; // Altura LI aninhada
+                                  estimatedNodeHeight += 1; // Pequeno espaço
+                              }
+                          });
+                      }
+                  }
+              });
+              estimatedNodeHeight += 3; // Espaço após a lista
+          } else if (node.tagName === 'HR') {
+              estimatedNodeHeight = 15; // Altura da linha horizontal + espaços
+              initialYForNode += 7; // Espaço antes da linha
+          }
+
+          // --- VERIFICAÇÃO DE PÁGINA ANTES DE DESENHAR ---
+          // Adiciona um padding extra para ser mais seguro na quebra de página
+          if (initialYForNode + estimatedNodeHeight + pageBreakPadding > pageHeight - bottomMargin) {
+              doc.addPage();
+              y = 15; // Reseta Y
+              initialYForNode = 15; // Reseta a Y temporária para o novo topo da página
+          }
+
+          // --- DESENHAR O CONTEÚDO ---
+          if (node.tagName === 'H1') {
+              y += 5; // Espaço antes do H1
+              y = drawText(textContent, y, 20, 'bold');
+              y += 5; // Espaço após o H1
+          } else if (node.tagName === 'H2') {
+              y += 6; // Espaço antes do H2
+              y = drawText(textContent, y, 16, 'bold');
+              y += 4; // Espaço após o H2
+          } else if (node.tagName === 'H3') {
+              y += 4; // Espaço antes do H3
+              y = drawText(textContent, y, 14, 'bold');
+              y += 2; // Espaço após o H3
+          } else if (node.tagName === 'P') {
+              y = drawText(textContent, y, 12);
+              y += 4; // Espaço após o parágrafo
+          } else if (node.tagName === 'UL') {
+              y += 3; // Espaço antes da lista
+              Array.from(node.children).forEach(li => {
+                  if (li.tagName === 'LI') {
+                      let liText = li.textContent.trim().replace(/<\/?strong>/g, '');
+                      doc.setFont(doc.getFont().fontName, 'normal');
+                      doc.setFontSize(12);
+                      
+                      const listItemPrefix = '• ';
+                      const splitLiText = doc.splitTextToSize(listItemPrefix + liText, availableWidth - 10);
+                      doc.text(splitLiText, marginX + 5, y); // Recuo para o bullet point
+                      y += (splitLiText.length * 12 * listItemLineSpacingFactor); // Ajuste fino para lista
+                      y += 1; // Pequeno espaço entre itens de lista
+                  }
+              });
+              y += 3; // Espaço após a lista
+          } else if (node.tagName === 'HR') {
+              y += 7; // Espaço antes da linha
+              doc.setDrawColor(0);
+              doc.line(marginX, y, pageWidth - marginX, y);
+              y += 7; // Espaço após a linha
+          }
+      } // Fim do loop for
+
+      const filename = `Plano_Carreira_${areaOfInterest.replace(' ', '_')}.pdf`;
+      doc.save(filename);
+  };
 
     const resetPlan = () => {
       setNameDev('')
