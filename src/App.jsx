@@ -128,19 +128,18 @@ function App() {
       }
 
       const doc = new jsPDF();
-      let y = 15; // Posição Y inicial
-      const marginX = 15; // Margem esquerda e direita
+      let y = 15; // Initial Y position
+      const marginX = 15; // Left and right margin
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
-      const availableWidth = pageWidth - 2 * marginX; // Largura disponível para o texto
-      const bottomMargin = 25; // AUMENTADO! Margem inferior para nova página.
-      const pageBreakPadding = 5; // Um pequeno "buffer" extra antes da quebra de página
+      const availableWidth = pageWidth - 2 * marginX; // Available width to add text
+      const bottomMargin = 25; // Margin bottom to next page
+      const pageBreakPadding = 5; // Extra "buffer" before page break
 
-      // Multiplicador padrão para altura de linha (leading)
-      const lineSpacingFactor = 1.1; // AUMENTADO para 1.1 para mais espaçamento dentro do texto
-      const listItemLineSpacingFactor = 0.9; // Mantido para listas, elas são mais compactas
+      const lineSpacingFactor = 1.1; // Line-height
+      const listItemLineSpacingFactor = 0.9; // Line-height to lists
 
-      // Função auxiliar para calcular a altura do texto
+      // Function to help calculate the correct text height
       const addTextAndGetHeight = (text, fontSize = 12, fontStyle = 'normal', width = availableWidth) => {
           doc.setFont(doc.getFont().fontName, fontStyle);
           doc.setFontSize(fontSize);
@@ -148,16 +147,16 @@ function App() {
           return splitText.length * fontSize * lineSpacingFactor;
       };
       
-      // Função auxiliar para efetivamente desenhar o texto
+      // Auxiliary function to draw text
       const drawText = (text, yPos, fontSize = 12, fontStyle = 'normal', indent = 0, width = availableWidth) => {
           doc.setFont(doc.getFont().fontName, fontStyle);
           doc.setFontSize(fontSize);
-          const splitText = doc.splitTextToSize(text, width - indent); // Ajusta largura para indentação
+          const splitText = doc.splitTextToSize(text, width - indent); // Adjust indentation
           doc.text(splitText, marginX + indent, yPos);
           return yPos + (splitText.length * fontSize * lineSpacingFactor);
       }
 
-      // --- Título Principal do PDF ---
+      // --- PDF Title ---
       let titleHeight = addTextAndGetHeight("Plano de Carreira para Desenvolvedores", 22, 'bold');
       let profileInfoHeight = addTextAndGetHeight(`Perfil: ${nameDev} é dev com interesse em ${areaOfInterest} e tem ${experience} anos de experiência.`, 10);
       
@@ -167,93 +166,92 @@ function App() {
       }
       y = drawText("Plano de Carreira para Desenvolvedores", y, 22, 'bold');
       y = drawText(`Perfil: ${nameDev} é dev com interesse em ${areaOfInterest} e tem ${experience} anos de experiência.`, y, 10);
-      y += 10; // Espaço após o cabeçalho do documento
+      y += 10; // White-space after doc header
 
-      // --- Processar o HTML do planContent ---
+      // --- Process the planContent HTML ---
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = planContent;
 
-      // Converter a coleção de filhos em um array para iterar
+      // Convert the collection of children to an array to iterate over
       const childrenNodes = Array.from(tempDiv.children);
 
       for (let i = 0; i < childrenNodes.length; i++) {
           const node = childrenNodes[i];
           const textContent = node.textContent.trim();
-          let estimatedNodeHeight = 0; // Altura estimada para o nó atual, incluindo espaçamento
-          let initialYForNode = y; // Guarda o 'y' antes de adicionar espaçamento pré-elemento
+          let estimatedNodeHeight = 0; // Estimated height for the current node, including spacing
+          let initialYForNode = y; // Keep the 'y' before adding pre-element spacing
 
-          // Calcular a altura estimada do nó e seu espaçamento antes
+          // Calculate the estimated node height and spacing before
           if (node.tagName === 'H1') {
               estimatedNodeHeight = addTextAndGetHeight(textContent, 20, 'bold');
-              estimatedNodeHeight += 10; // Espaço após H1
-              initialYForNode += 5; // Espaço antes H1
+              estimatedNodeHeight += 10; // White-space after H1
+              initialYForNode += 5; // White-space before H1
           } else if (node.tagName === 'H2') {
               estimatedNodeHeight = addTextAndGetHeight(textContent, 16, 'bold');
-              estimatedNodeHeight += 8; // Espaço após H2
-              initialYForNode += 6; // Espaço antes H2
+              estimatedNodeHeight += 8; // White-space after H2
+              initialYForNode += 6; // White-space before H2
           } else if (node.tagName === 'H3') {
               estimatedNodeHeight = addTextAndGetHeight(textContent, 14, 'bold');
-              estimatedNodeHeight += 6; // Espaço após H3
-              initialYForNode += 4; // Espaço antes H3
+              estimatedNodeHeight += 6; // White-space after H3
+              initialYForNode += 4; // White-space before H3
           } else if (node.tagName === 'P') {
               estimatedNodeHeight = addTextAndGetHeight(textContent, 12);
-              estimatedNodeHeight += 4; // Espaço após P
+              estimatedNodeHeight += 4; // White-space after P
           } else if (node.tagName === 'UL') {
-              estimatedNodeHeight += 3; // Espaço antes da lista
+              estimatedNodeHeight += 3; // White-space before list
               Array.from(node.children).forEach(li => {
                   if (li.tagName === 'LI') {
                       let liText = li.textContent.trim().replace(/<\/?strong>/g, '');
-                      // Usamos listItemLineSpacingFactor para o cálculo de altura de LI
-                      doc.setFontSize(12); // Definir temporariamente para o cálculo
-                      const splitLiTextCalc = doc.splitTextToSize(`• ${liText}`, availableWidth - 10); // Mesma largura do desenho
-                      estimatedNodeHeight += splitLiTextCalc.length * 12 * listItemLineSpacingFactor; // Altura LI
-                      estimatedNodeHeight += 1; // Pequeno espaço entre itens de lista
+                      doc.setFontSize(12);
+                      const splitLiTextCalc = doc.splitTextToSize(`• ${liText}`, availableWidth - 10);
+                      estimatedNodeHeight += splitLiTextCalc.length * 12 * listItemLineSpacingFactor;
+                      estimatedNodeHeight += 1;
 
                       if (li.querySelector('ul')) {
                           Array.from(li.querySelector('ul').children).forEach(nestedLi => {
                               if (nestedLi.tagName === 'LI') {
                                   let nestedLiText = nestedLi.textContent.trim().replace(/<\/?strong>/g, '');
-                                  doc.setFontSize(12); // Definir temporariamente
+                                  doc.setFontSize(12);
                                   const splitNestedTextCalc = doc.splitTextToSize(`  - ${nestedLiText}`, availableWidth - 15);
-                                  estimatedNodeHeight += splitNestedTextCalc.length * 12 * listItemLineSpacingFactor; // Altura LI aninhada
-                                  estimatedNodeHeight += 1; // Pequeno espaço
+                                  estimatedNodeHeight += splitNestedTextCalc.length * 12 * listItemLineSpacingFactor;
+                                  estimatedNodeHeight += 1;
                               }
                           });
                       }
                   }
               });
-              estimatedNodeHeight += 3; // Espaço após a lista
+              estimatedNodeHeight += 3; // White-space after list
           } else if (node.tagName === 'HR') {
-              estimatedNodeHeight = 15; // Altura da linha horizontal + espaços
-              initialYForNode += 7; // Espaço antes da linha
+              estimatedNodeHeight = 15;
+              initialYForNode += 7;
           }
 
           // --- VERIFICAÇÃO DE PÁGINA ANTES DE DESENHAR ---
           // Adiciona um padding extra para ser mais seguro na quebra de página
           if (initialYForNode + estimatedNodeHeight + pageBreakPadding > pageHeight - bottomMargin) {
               doc.addPage();
-              y = 15; // Reseta Y
-              initialYForNode = 15; // Reseta a Y temporária para o novo topo da página
+              y = 15; // Reset Y
+              initialYForNode = 15; // Reset Y temporarily to a new page top
           }
 
-          // --- DESENHAR O CONTEÚDO ---
+          // --- Draw the content ---
           if (node.tagName === 'H1') {
-              y += 5; // Espaço antes do H1
+              y += 5; // White-space before do H1
               y = drawText(textContent, y, 20, 'bold');
-              y += 5; // Espaço após o H1
+              y += 5; // White-space after o H1
           } else if (node.tagName === 'H2') {
-              y += 6; // Espaço antes do H2
+              y += 6; // White-space before do H2
               y = drawText(textContent, y, 16, 'bold');
-              y += 4; // Espaço após o H2
+              y += 4; // White-space after o H2
           } else if (node.tagName === 'H3') {
-              y += 4; // Espaço antes do H3
+              y += 4; // White-space before do H3
               y = drawText(textContent, y, 14, 'bold');
-              y += 2; // Espaço após o H3
+              y += 2; // White-space after o H3
           } else if (node.tagName === 'P') {
               y = drawText(textContent, y, 12);
-              y += 4; // Espaço após o parágrafo
+              y += 4; // White-space after o parágrafo
           } else if (node.tagName === 'UL') {
-              y += 3; // Espaço antes da lista
+              y += 3; // White-space before da lista
               Array.from(node.children).forEach(li => {
                   if (li.tagName === 'LI') {
                       let liText = li.textContent.trim().replace(/<\/?strong>/g, '');
@@ -262,19 +260,19 @@ function App() {
                       
                       const listItemPrefix = '• ';
                       const splitLiText = doc.splitTextToSize(listItemPrefix + liText, availableWidth - 10);
-                      doc.text(splitLiText, marginX + 5, y); // Recuo para o bullet point
-                      y += (splitLiText.length * 12 * listItemLineSpacingFactor); // Ajuste fino para lista
-                      y += 1; // Pequeno espaço entre itens de lista
+                      doc.text(splitLiText, marginX + 5, y); // Indent to a bullet point
+                      y += (splitLiText.length * 12 * listItemLineSpacingFactor);
+                      y += 1;
                   }
               });
-              y += 3; // Espaço após a lista
+              y += 3; // White-space after a lista
           } else if (node.tagName === 'HR') {
-              y += 7; // Espaço antes da linha
+              y += 7; // White-space before da linha
               doc.setDrawColor(0);
               doc.line(marginX, y, pageWidth - marginX, y);
-              y += 7; // Espaço após a linha
+              y += 7; // White-space after a linha
           }
-      } // Fim do loop for
+      }
 
       const filename = `Plano_Carreira_${areaOfInterest.replace(' ', '_')}.pdf`;
       doc.save(filename);
