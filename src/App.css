@@ -10,16 +10,17 @@ body {
   margin: 0;
   padding: 20px;
   background-color: #f4f7f6;
-  color: #333;
+  color: #252525;
 }
 
 .App {
   max-width: 900px;
   margin: 0 auto;
-  background-color: #fff;
+  background-color: #252525;
   padding: 30px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+  color: #f4f7f6;
 }
 
 .loader {
@@ -28,7 +29,7 @@ body {
 
 h1 {
   text-align: center;
-  color: #2c3e50;
+  color: #f4f7f6;
   margin-bottom: 30px;
 }
 
@@ -38,19 +39,19 @@ h1.mentor-ai {
 }
 
 h2 {
-  color: #34495e;
+  color: #f4f7f6;
   border-bottom: 2px solid #eee;
   margin: 20px;
 }
 
 
 h3 {
-  color: #555;
+  color: #f4f7f6;
 }
 
 hr {
   border: none;
-  border-top: 1px dashed #ccc;
+  border-top: 1px dashed #f4f7f6;
   margin-top: 20px;
 }
 
@@ -69,7 +70,7 @@ hr {
 }
 
 .plan-output, .feedback-output {
-  background-color: #ecf0f1;
+  background-color: #333;
   border: 1px solid #ccc;
   padding: 20px;
   border-radius: 5px;
@@ -109,6 +110,7 @@ button {
 
 button.new-plan {
   background-color: #333;
+  border: 1px solid #f4f7f6;
 }
 
 button.new-plan:hover {
@@ -121,7 +123,7 @@ button:hover {
 }
 
 button:disabled {
-  background-color: #ccc;
+  background-color: #f4f7f6;
   cursor: not-allowed;
 }
 
@@ -133,7 +135,7 @@ button:disabled {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
-  color: #34495e;
+  color: #f4f7f6;
 }
 
 .form-group input[type="text"],

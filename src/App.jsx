@@ -361,7 +361,7 @@ function App() {
                       <button onClick={handleDownloadPdf} disabled={isLoading}>
                         Baixar Plano como PDF
                       </button>
-                      <button className='new-plan' onClick={resetPlan}>Gerar novo plano</button>
+                      <button className='new-plan' onClick={resetPlan}>Gerar Novo Plano</button>
                     </div>
                 </div>
             )}
